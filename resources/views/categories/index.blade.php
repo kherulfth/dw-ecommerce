@@ -19,10 +19,34 @@
                                 <h4 class="card-title">Kategori Baru</h4>
                             </div>
                             <div class="card-body">
+                                <form action="{{ route('category.store') }}" method="post">
+                                    @csrf
+                                    <div class="form-group">
+                                        <label for="name">Kategori</label>
+                                        <input type="text" name="name" class="form-control" required>
+                                        <p class="text-danger">{{ $errors->first('name') }}</p>
+                                    </div>
+            
+                                    <div class="form-group">
+                                        <label for="parent_id">Kategori</label>
+                                        <select name="parent_id" class="form-control">
+                                            <option value="">None</option>
+                                            @foreach ($parent as $row)
+                                            <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <p class="text-danger">{{ $errors->first('name') }}</p>
+                                    </div>
 
+                                    <div class="form-group">
+                                        <button class="btn btn-primary btn-sm">Tambah</button>
+                                    </div>
+                                </form>
                             </div>
+                            
                         </div>
                     </div>
+                    
                     <div class="col-md-8">
                         <div class="card">
                             <div class="header">
@@ -59,7 +83,7 @@
                                                     @csrf
                                                     @method('DELETE')
 
-                                                    <a href="{{ route('category.edit', $val->id) }}" class="btn btn warning btn-sm">Edit</a>
+                                                    <a href="{{ route('category.edit', $val->id) }}" class="btn btn-warning btn-sm">Edit</a>
                                                     <button class="btn btn-danger btn-sm">Hapus</button>
                                                 </form>
                                             </td>
