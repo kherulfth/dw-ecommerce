@@ -52,11 +52,9 @@ class CategoryController extends Controller
 
         $category = Category::withCount(['child'])->find($id);
 
-        if ($category->child_count == 0) {
+        if ($category->child_count == 0 && $category->product_count == 0) {
             $category->delete();
-
             return redirect(route('category.index'))->with(['success' => 'Kategori Dihapus !']);
-
         }
 
         return redirect(route('category.index'))->with(['success' => 'Kategori Ini Memiliki Anak Kategori !']);
