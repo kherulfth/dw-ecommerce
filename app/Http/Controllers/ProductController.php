@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use File;
 use App\Product;
 use App\Category;
+use App\Jobs\ProductJob;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use File;
 
 class ProductController extends Controller
 {
@@ -54,7 +55,7 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|integer',
             'weight' => 'required|integer',
-            'image' => 'required|image|mimes:png, jpeg, jpg',
+            'image' => 'required|image|mimes:jpg,png,jpeg'
         ]);
 
         if ($request->hasFile('image')) {
@@ -75,7 +76,7 @@ class ProductController extends Controller
             $product->save();
         }
 
-        return redirect(route('products.index'))->with(['success' => 'Produk Baru Ditambahkan !']);
+        return redirect(route('product.index'))->with(['success' => 'Produk Baru Ditambahkan !']);
 
     }
 
@@ -128,6 +129,32 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect(route('products.index'))->with(['success' => 'Produk Sudah Dihapus !']);
+
+    }
+
+    public function massUploadForm(){
+        $category = Category::orderBy('name', 'DESC')->get();
+
+        return view('products.bulk', compact('category'));
+    }
+
+    public function massUpload(Request $request){
+        $this->validate($request, [
+            'category_id' => 'required|exists:categories,id',
+            'file' => 'required|mimes:xlsx'
+        ]);
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+
+            $filename = time() . '-product.' . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('public/uploads', $filename);
+
+            ProductJob::dispatch($request->category_id, $filename);
+
+            return redirect()->back()->with(['success' => 'Upload Produk Dijadwalkan !']);
+
+        }
 
     }
 }

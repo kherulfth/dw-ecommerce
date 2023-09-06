@@ -22,5 +22,9 @@ Route::group([
 
     Route::get('/home', 'HomeController@index')->name('home');
     Route::resource('category', 'CategoryController')->except(['create', 'show']);
-    Route::resource('product', 'ProductController');
+    Route::resource('product', 'ProductController')->except(['show']);
+    Route::get('/product/bulk', 'ProductController@massUploadForm')->name('product.bulk');
+    Route::post('/product/bulk', 'ProductController@massUpload')->name('product.saveBulk');
+
+
 });
