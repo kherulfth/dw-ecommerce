@@ -72,7 +72,7 @@
                                                         @csrf
                                                         @method('DELETE')
     
-                                                        <a href="{{ route('product.edit', $row ?? ''->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                                        <a href="{{ route('product.edit', $row->id) }}" class="btn btn-warning btn-sm">Edit</a>
                                                         <button class="btn btn-danger btn-sm">Hapus</button>
                                                     </form>
                                                 </td>

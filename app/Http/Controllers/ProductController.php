@@ -99,7 +99,10 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        //
+        $product = Product::find($id);
+        $category = Category::orderBy('name', 'DESC')->get();
+
+        return view('products.edit', compact('product', 'category'));
     }
 
     /**
@@ -111,7 +114,38 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required|string|max:100',
+            'description' => 'required|',
+            'category_id' => 'required|exists:categories,id',
+            'price' => 'required|integer',
+            'weight' => 'required|integer',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg'
+        ]);
+
+        $product = Product::find($id);
+        $filename = $product->image;
+
+        // dd($product->id);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+
+            $filename = time() . Str::slug($request->name) . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('public/products', $filename);
+            File::delete(storage_path('app/public/products/' . $product->image));
+        }
+
+        $product->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'category_id' => $request->category_id,
+            'price' => $request->price,
+            'weight' => $request->weight,
+            'image' => $filename
+        ]);
+
+        return redirect(route('product.index'))->with(['success' => 'Produk Baru Diperbaharui !']);
     }
 
     /**
@@ -128,7 +162,7 @@ class ProductController extends Controller
 
         $product->delete();
 
-        return redirect(route('products.index'))->with(['success' => 'Produk Sudah Dihapus !']);
+        return redirect(route('product.index'))->with(['success' => 'Produk Sudah Dihapus !']);
 
     }
 
